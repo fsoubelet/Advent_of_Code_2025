@@ -41,6 +41,31 @@ Your job is to find all of the invalid IDs that appear in the given ranges. In t
 Adding up all the invalid IDs in this example produces 1227775554.
 
 What do you get if you add up all of the invalid IDs?
+
+--- Part Two ---
+
+The clerk quickly discovers that there are still invalid IDs in the ranges in your list.
+Maybe the young Elf was doing other silly patterns as well?
+
+Now, an ID is invalid if it is made only of some sequence of digits repeated at least twice.
+So, 12341234 (1234 two times), 123123123 (123 three times), 1212121212 (12 five times), and 1111111 (1 seven times) are all invalid IDs.
+
+From the same example as before:
+
+    11-22 still has two invalid IDs, 11 and 22.
+    95-115 now has two invalid IDs, 99 and 111.
+    998-1012 now has two invalid IDs, 999 and 1010.
+    1188511880-1188511890 still has one invalid ID, 1188511885.
+    222220-222224 still has one invalid ID, 222222.
+    1698522-1698528 still contains no invalid IDs.
+    446443-446449 still has one invalid ID, 446446.
+    38593856-38593862 still has one invalid ID, 38593859.
+    565653-565659 now has one invalid ID, 565656.
+    824824821-824824827 now has one invalid ID, 824824824.
+    2121212118-2121212124 now has one invalid ID, 2121212121.
+
+Adding up all the invalid IDs in this example produces 4174379265.
+What do you get if you add up all of the invalid IDs using these new rules?
 """
 
 from __future__ import annotations
@@ -100,18 +125,19 @@ def is_invalid_id_part1(num: int) -> bool:
     num_str = str(num)
     length = len(num_str)
 
-    # Invalid IDs must have an even number of digits
+    # Must have even length to be split in half
     if length % 2 != 0:
         return False
 
-    if num_str[0] == "0":
-        return False
-
+    # Split in half and check if both halves are equal
     half_length = length // 2
     first_half = num_str[:half_length]
     second_half = num_str[half_length:]
 
-    return first_half == second_half
+    # Check if they match and no leading zeros (except for "0" itself)
+    if first_half == second_half and (first_half[0] != "0" or first_half == "0"):
+        return True
+    return False
 
 
 def solve_part1(inputs: str) -> int:
@@ -145,8 +171,71 @@ def solve_part1(inputs: str) -> int:
 # ----- Part 2 ----- #
 
 
-def solve_part2():
-    pass
+def is_invalid_id_part2(num: int) -> bool:
+    """
+    Determines if a given number is an invalid product ID based on
+    the criteria for part 2: it is invalide if it consists of a
+    sequence of digits repeated at least twice. A leading zero
+    disqualifies the number.
+
+    Parameters
+    ----------
+    num : int
+        The number to check.
+
+    Returns
+    -------
+    bool
+        Wether the number is an invalid product ID.
+    """
+    num_str = str(num)
+    length = len(num_str)
+
+    # Check for all possible pattern lengths from 1 to
+    # length//2 (we need at least 2 repetitions)
+    for pattern_length in range(1, length // 2 + 1):
+        # Check if the length is divisible by pattern length
+        if length % pattern_length == 0:
+            pattern: str = num_str[:pattern_length]
+
+            # Check if no leading zeros (except for "0" itself)
+            if pattern[0] == "0" and pattern != "0":
+                continue
+
+            # Check if the entire string is this pattern repeated
+            num_repetitions = length // pattern_length
+            if pattern * num_repetitions == num_str:
+                return True
+
+    return False
+
+
+def solve_part2(inputs: str) -> int:
+    """
+    Solves part 1 of the gift shop problem. We split the input into
+    parsed ranges, then go through all numbers in each range and check
+    if they are invalid product IDs. If they are, we add them to a
+    running total.
+
+    Parameters
+    ----------
+    inputs : str
+        The input text containing the ranges.
+
+    Returns
+    -------
+    int
+        The sum of all invalid product IDs found in the ranges.
+    """
+    ranges = parse_ranges(inputs)
+    invalid_id_sum = 0
+
+    for start, end in ranges:
+        for num in range(start, end + 1):
+            if is_invalid_id_part2(num):
+                invalid_id_sum += num
+
+    return invalid_id_sum
 
 
 # ----- Running ----- #
@@ -154,8 +243,10 @@ def solve_part2():
 if __name__ == "__main__":
     inputs: str = INPUTS.read_text()
 
+    # print(solve_part1(EXAMPLE.read_text()))
     solution1 = solve_part1(inputs)
     print(f"Part 1 answer: {solution1}")
 
-    # solution2 = solve_part2(inputs)
-    # print(f"Part 2 answer: {solution2}")
+    # print(solve_part2(EXAMPLE.read_text()))
+    solution2 = solve_part2(inputs)
+    print(f"Part 2 answer: {solution2}")
