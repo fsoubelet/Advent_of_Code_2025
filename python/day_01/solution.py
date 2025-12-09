@@ -233,6 +233,8 @@ def solve_part2(starting_value: int, full_inputs: list[str]) -> int:
     return zero_counter
 
 
+# ----- Running ----- #
+
 if __name__ == "__main__":
     inputs = (DAY_DIR / "input.txt").read_text().splitlines()
 
