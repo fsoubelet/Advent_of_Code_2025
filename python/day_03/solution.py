@@ -138,7 +138,7 @@ def solve_part1(inputs: list[str]) -> int:
     total_joltage: int = 0
 
     for bank in inputs:
-        total_joltage += find_bank_joltage(bank)
+        total_joltage += find_bank_joltage_part1(bank)
 
     return total_joltage
 
@@ -146,11 +146,88 @@ def solve_part1(inputs: list[str]) -> int:
 # ----- Part 2 ----- #
 
 
+def find_bank_joltage_part2(bank: str) -> int:
+    """
+    Provided with a bank of batteries as a string, finds the maximum
+    joltage possiblly attainable by turning on TWELVE batteries. This is
+    done by going through all possible combinations of 12 batteries (still
+    preserving left-right order) and checking which produces the largest
+    number.
+
+    Note
+    ----
+    There is probably a more elegant way to do this, but considering that
+    12 is not that large, brute writing out the various loops is doable
+    and has the advantage of being explicit and clear.
+
+    Parameters
+    ----------
+    bank : str
+        A string digits representing a bank of batteries.
+
+    Returns
+    -------
+    int
+        The maximum joltage possible by turning on twelve batteries.
+    """
+    max_joltage: int = 0
+
+    # We go through all the possible combinations of 12 batteries
+    for i1 in range(len(bank)):
+        for i2 in range(i1 + 1, len(bank)):
+            for i3 in range(i2 + 1, len(bank)):
+                for i4 in range(i3 + 1, len(bank)):
+                    for i5 in range(i4 + 1, len(bank)):
+                        for i6 in range(i5 + 1, len(bank)):
+                            for i7 in range(i6 + 1, len(bank)):
+                                for i8 in range(i7 + 1, len(bank)):
+                                    for i9 in range(i8 + 1, len(bank)):
+                                        for i10 in range(i9 + 1, len(bank)):
+                                            for i11 in range(i10 + 1, len(bank)):
+                                                for i12 in range(i11 + 1, len(bank)):
+                                                    # Form the joltage by turning on batteries at these positions
+                                                    joltage: int = int(
+                                                        bank[i1]
+                                                        + bank[i2]
+                                                        + bank[i3]
+                                                        + bank[i4]
+                                                        + bank[i5]
+                                                        + bank[i6]
+                                                        + bank[i7]
+                                                        + bank[i8]
+                                                        + bank[i9]
+                                                        + bank[i10]
+                                                        + bank[i11]
+                                                        + bank[i12]
+                                                    )
+                                                    # Check if this is the largest we've seen so far
+                                                    if joltage > max_joltage:
+                                                        max_joltage = joltage
+    return max_joltage
+
+
 def solve_part2(inputs: list[str]) -> int:
     """
-    Solves part 2
+    Solves part 2 We go find the maximum joltage for each bank (input
+    line) with the new rules of part 2 and sum all of these up.
+
+    Parameters
+    ----------
+    inputs : list[str]
+        The input lines representing banks of batteries.
+
+    Returns
+    -------
+    int
+        The total output joltage.
     """
-    return 0
+    total_joltage: int = 0
+
+    for bank in inputs:
+        print(bank)
+        total_joltage += find_bank_joltage_part2(bank)
+
+    return total_joltage
 
 
 # ----- Running ----- #
@@ -162,6 +239,6 @@ if __name__ == "__main__":
     solution1 = solve_part1(inputs)
     print(f"Part 1 answer: {solution1}")
 
-    # print(solve_part2(EEXAMPLE.read_text().splitlines()))
-    # solution2 = solve_part2(inputs)
-    # print(f"Part 2 answer: {solution2}")
+    # print(solve_part2(EXAMPLE.read_text().splitlines()))
+    solution2 = solve_part2(inputs)
+    print(f"Part 2 answer: {solution2}")
