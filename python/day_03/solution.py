@@ -149,16 +149,19 @@ def solve_part1(inputs: list[str]) -> int:
 def find_bank_joltage_part2(bank: str) -> int:
     """
     Provided with a bank of batteries as a string, finds the maximum
-    joltage possiblly attainable by turning on TWELVE batteries. This is
-    done by going through all possible combinations of 12 batteries (still
-    preserving left-right order) and checking which produces the largest
-    number.
+    joltage possiblly attainable by turning on TWELVE batteries while
+    preserving order.
 
     Note
     ----
-    There is probably a more elegant way to do this, but considering that
-    12 is not that large, brute writing out the various loops is doable
-    and has the advantage of being explicit and clear.
+    Considering the length of the inputs (not the examples) doing a brute
+    force à la part 2 with 12 nested loops is not feasible. Instead, we use
+    a greedy algorithm by choosing the highest digit in a windowed selection:
+    for each of the 12 positions, we pick the largest digit available within
+    the window that still allows filling the remaining positions.
+
+    We're basically looking at a window of 12 digits, find the highest, then
+    start over from the next digit position until we've picked 12 digits.
 
     Parameters
     ----------
@@ -170,40 +173,32 @@ def find_bank_joltage_part2(bank: str) -> int:
     int
         The maximum joltage possible by turning on twelve batteries.
     """
-    max_joltage: int = 0
+    result_digits: list[str] = []
+    remaining_digits: int = 12
+    n: int = len(bank)
+    start: int = 0
 
-    # We go through all the possible combinations of 12 batteries
-    for i1 in range(len(bank)):
-        for i2 in range(i1 + 1, len(bank)):
-            for i3 in range(i2 + 1, len(bank)):
-                for i4 in range(i3 + 1, len(bank)):
-                    for i5 in range(i4 + 1, len(bank)):
-                        for i6 in range(i5 + 1, len(bank)):
-                            for i7 in range(i6 + 1, len(bank)):
-                                for i8 in range(i7 + 1, len(bank)):
-                                    for i9 in range(i8 + 1, len(bank)):
-                                        for i10 in range(i9 + 1, len(bank)):
-                                            for i11 in range(i10 + 1, len(bank)):
-                                                for i12 in range(i11 + 1, len(bank)):
-                                                    # Form the joltage by turning on batteries at these positions
-                                                    joltage: int = int(
-                                                        bank[i1]
-                                                        + bank[i2]
-                                                        + bank[i3]
-                                                        + bank[i4]
-                                                        + bank[i5]
-                                                        + bank[i6]
-                                                        + bank[i7]
-                                                        + bank[i8]
-                                                        + bank[i9]
-                                                        + bank[i10]
-                                                        + bank[i11]
-                                                        + bank[i12]
-                                                    )
-                                                    # Check if this is the largest we've seen so far
-                                                    if joltage > max_joltage:
-                                                        max_joltage = joltage
-    return max_joltage
+    # For each slot we must pick one digit, and we do so 12 times
+    while remaining_digits > 0:
+        # We can pick from start to (n - remaining_digits) inclusive for this window
+        end: int = n - remaining_digits
+
+        # Now we find the position of the highest digit (and
+        # its value) in the window bank[start:end]
+        best_idx: int = start
+        for i in range(start, end + 1):
+            if bank[i] > bank[best_idx]:  # python strings compare lexicographically
+                best_idx = i  # current position of the highest digit in that window
+
+        # We've looked at the 12 digits in the window and noted the index
+        # of the highest. We store the digit value at that index and move
+        # our start position to one after that index for the next round.
+        result_digits.append(bank[best_idx])
+        start = best_idx + 1
+        remaining_digits -= 1
+
+    # We only need to join the picked digits and convert to int
+    return int("".join(result_digits))
 
 
 def solve_part2(inputs: list[str]) -> int:
@@ -224,7 +219,6 @@ def solve_part2(inputs: list[str]) -> int:
     total_joltage: int = 0
 
     for bank in inputs:
-        print(bank)
         total_joltage += find_bank_joltage_part2(bank)
 
     return total_joltage
