@@ -403,11 +403,18 @@ def solve_part2(inputs: list[str]) -> int:
             can_iterate = False
             continue
 
+        # Do a pass to convert 'x' to '.' for the next iteration
+        # This is just to check the example more easily
+        # for i in range(len(grid)):
+        #     for j in range(len(grid[0])):
+        #         if grid[i][j] == "x":
+        #             grid[i][j] = "."
+
         # Now we remove these accessible rolls from the grid
         # for the next iteration (replace '@' by '.')
         for position in accessible_positions:
             i, j = position
-            grid[i][j] = "."
+            grid[i][j] = "x"  # like the example
 
     # We exit that loop when no more rolls can be removed
     return removable_rolls
@@ -422,6 +429,6 @@ if __name__ == "__main__":
     # solution1 = solve_part1(inputs)
     # print(f"Part 1 answer: {solution1}")
 
-    # print(solve_part2(EXAMPLE.read_text().splitlines()))
-    solution2 = solve_part2(inputs)
-    print(f"Part 2 answer: {solution2}")
+    print(solve_part2(EXAMPLE.read_text().splitlines()))
+    # solution2 = solve_part2(inputs)
+    # print(f"Part 2 answer: {solution2}")
