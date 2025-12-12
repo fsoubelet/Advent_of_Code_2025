@@ -187,6 +187,7 @@ How many rolls of paper in total can be removed by the Elves and their forklifts
 from __future__ import annotations
 
 from pathlib import Path
+from pprint import pprint
 
 DAY_DIR: Path = Path(__file__).parent
 INPUTS: Path = DAY_DIR / "input.txt"
@@ -278,7 +279,8 @@ def solve_part1(inputs: list[str]) -> int:
 
 # ----- Part 2 ----- #
 
-def reacheable_rolls(inputs: list[str]) -> int:
+
+def reacheable_rolls(inputs: list[str]) -> list[tuple[int, int]]:
     """
     Almost like solving part 1. Go over the complete input
     and determine the positions of all paper rolls that can
@@ -311,8 +313,8 @@ def reacheable_rolls(inputs: list[str]) -> int:
 
     Returns
     -------
-    int
-        The number of rolls of paper that can be accessed
+    list[tuple[int, int]]
+        The positions of all paper rolls which can be accessed
         by a forklift.
     """
     acessible_positions: list[tuple[int, int]] = []
@@ -357,38 +359,20 @@ def reacheable_rolls(inputs: list[str]) -> int:
     return acessible_positions
 
 
-
 def solve_part2(inputs: list[str]) -> int:
     """
     Solves part 2. Determines from the complete input
     how many rolls of paper can be removed by a forklift
     before no more rolls are accessible.
 
+    Note
+    ----
     This is done by iterating as done in part 1 over the
     input grid to determine which rolls can be accessed
     by a forklift and storing these positions. After a
     pass, the stored positions are modified in the input
     to not contain a roll anymore and a new pass is done.
     This repeats until no more rolls can be accessed.
-
-    Note
-    ----
-    We denote i the index along the vertical axis (rows)
-    and j the index along the horizontal axis (columns).
-    Inspecting for a position at indices (i, j) requires
-    checking the following relative positions:
-        - (i-1, j-1) : top left
-        - (i-1, j)   : top
-        - (i-1, j+1) : top right
-        - (i, j-1)   : left
-        - (i, j+1)   : right
-        - (i+1, j-1) : bottom left
-        - (i+1, j)   : bottom
-        - (i+1, j+1) : bottom right
-
-    If any of these positions are out of bounds, then they
-    are simply ignored. Naturally, a position is not checked
-    if it does not contain a roll of paper (@).
 
     Parameters
     ----------
@@ -401,7 +385,32 @@ def solve_part2(inputs: list[str]) -> int:
         The number of rolls that can be removed before no
         more rolls are accessible by a forklift.
     """
-    return 0
+    grid: list[list[str]] = [list(line) for line in inputs]
+    can_iterate = True
+    removable_rolls: int = 0
+
+    while can_iterate:
+        # pprint(grid)  # so we can check on the example
+        accessible_positions: list[tuple[int, int]] = reacheable_rolls(grid)
+        n_removable: int = len(accessible_positions)
+        # print(f"Removable: {n_removable}\n")  # so we can check on the example
+
+        # Keep track of the number of removable rolls
+        removable_rolls += n_removable
+
+        # If there's nothing to remove we are done
+        if n_removable == 0:
+            can_iterate = False
+            continue
+
+        # Now we remove these accessible rolls from the grid
+        # for the next iteration (replace '@' by '.')
+        for position in accessible_positions:
+            i, j = position
+            grid[i][j] = "."
+
+    # We exit that loop when no more rolls can be removed
+    return removable_rolls
 
 
 # ----- Running ----- #
@@ -410,9 +419,9 @@ if __name__ == "__main__":
     inputs: list[str] = INPUTS.read_text().splitlines()
 
     # print(solve_part1(EXAMPLE.read_text().splitlines()))
-    solution1 = solve_part1(inputs)
-    print(f"Part 1 answer: {solution1}")
+    # solution1 = solve_part1(inputs)
+    # print(f"Part 1 answer: {solution1}")
 
     # print(solve_part2(EXAMPLE.read_text().splitlines()))
-    # solution2 = solve_part2(inputs)
-    # print(f"Part 2 answer: {solution2}")
+    solution2 = solve_part2(inputs)
+    print(f"Part 2 answer: {solution2}")
