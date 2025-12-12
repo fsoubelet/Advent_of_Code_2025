@@ -62,7 +62,30 @@ EXAMPLE: Path = DAY_DIR / "example.txt"
 
 def solve_part1(inputs: list[str]) -> int:
     """
-    Solves part 1.
+    Solves part 1. Determines from the complete input
+    how many rolls of paper can be accessed by a forklift.
+    This is done by going over each position in the grid
+    and checking for the eight adjacent positions while
+    coubting the number of rolls of paper (@) found.
+
+    Note
+    ----
+    We denote i the index along the vertical axis (rows)
+    and j the index along the horizontal axis (columns).
+    Inspecting for a position at indices (i, j) requires
+    checking the following relative positions:
+        - (i-1, j-1) : top left
+        - (i-1, j)   : top
+        - (i-1, j+1) : top right
+        - (i, j-1)   : left
+        - (i, j+1)   : right
+        - (i+1, j-1) : bottom left
+        - (i+1, j)   : bottom
+        - (i+1, j+1) : bottom right
+
+    If any of these positions are out of bounds, then they
+    are simply ignored. Naturally, a position is not checked
+    if it does not contain a roll of paper (@).
 
     Parameters
     ----------
@@ -72,8 +95,25 @@ def solve_part1(inputs: list[str]) -> int:
     Returns
     -------
     int
+        The number of rolls of paper that can be accessed
+        by a forklift.
     """
-    return 0
+    reachable_rolls: int = 0
+
+    n_rows: int = len(inputs)
+    n_cols: int = len(inputs[0])
+
+    for i in range(n_rows):
+        for j in range(n_cols):
+
+            # Move on if position (i, j) is not a paper roll
+            if inputs[i][j] != "@":
+                continue
+
+            # Count the number of adjacent paper rolls
+            adjacent_rolls: int = 0
+
+
 
 
 # ----- Part 2 ----- #
