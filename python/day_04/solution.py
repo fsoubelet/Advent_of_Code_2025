@@ -187,7 +187,7 @@ How many rolls of paper in total can be removed by the Elves and their forklifts
 from __future__ import annotations
 
 from pathlib import Path
-from pprint import pprint
+from pprint import pprint  # noqa: F401
 
 DAY_DIR: Path = Path(__file__).parent
 INPUTS: Path = DAY_DIR / "input.txt"
