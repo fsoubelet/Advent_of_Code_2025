@@ -103,17 +103,41 @@ def solve_part1(inputs: list[str]) -> int:
     n_rows: int = len(inputs)
     n_cols: int = len(inputs[0])
 
+    # We need to be careful that Python list indexing does
+    # a looparound when using negative indices.
     for i in range(n_rows):
         for j in range(n_cols):
-
             # Move on if position (i, j) is not a paper roll
             if inputs[i][j] != "@":
                 continue
 
             # Count the number of adjacent paper rolls
             adjacent_rolls: int = 0
+            for i_inc in [-1, 0, 1]:
+                for j_inc in [-1, 0, 1]:
+                    # Skip the position itself
+                    if i_inc == 0 and j_inc == 0:
+                        continue
 
+                    ni: int = i + i_inc
+                    nj: int = j + j_inc
 
+                    # Check for out of bounds
+                    if ni < 0 or ni >= n_rows:
+                        continue
+                    if nj < 0 or nj >= n_cols:
+                        continue
+
+                    # Count adjacent paper roll
+                    if inputs[ni][nj] == "@":
+                        adjacent_rolls += 1
+
+            # Check if the roll is reachable
+            if adjacent_rolls < 4:
+                reachable_rolls += 1
+                # print(i, j)  # so we can check on the example
+
+    return reachable_rolls
 
 
 # ----- Part 2 ----- #
@@ -140,9 +164,9 @@ def solve_part2(inputs: list[str]) -> int:
 if __name__ == "__main__":
     inputs: list[str] = INPUTS.read_text().splitlines()
 
-    print(solve_part1(EXAMPLE.read_text().splitlines()))
-    # solution1 = solve_part1(inputs)
-    # print(f"Part 1 answer: {solution1}")
+    # print(solve_part1(EXAMPLE.read_text().splitlines()))
+    solution1 = solve_part1(inputs)
+    print(f"Part 1 answer: {solution1}")
 
     # print(solve_part2(EXAMPLE.read_text().splitlines()))
     # solution2 = solve_part2(inputs)
