@@ -278,10 +278,31 @@ def solve_part1(inputs: list[str]) -> int:
 
 # ----- Part 2 ----- #
 
-
-def solve_part2(inputs: list[str]) -> int:
+def reacheable_rolls(inputs: list[str]) -> int:
     """
-    Solves part 2.
+    Almost like solving part 1. Go over the complete input
+    and determine the positions of all paper rolls that can
+    be accessed. The positions are then returned. This is used
+    to solve a single step in part 2.
+
+    Note
+    ----
+    We denote i the index along the vertical axis (rows)
+    and j the index along the horizontal axis (columns).
+    Inspecting for a position at indices (i, j) requires
+    checking the following relative positions:
+        - (i-1, j-1) : top left
+        - (i-1, j)   : top
+        - (i-1, j+1) : top right
+        - (i, j-1)   : left
+        - (i, j+1)   : right
+        - (i+1, j-1) : bottom left
+        - (i+1, j)   : bottom
+        - (i+1, j+1) : bottom right
+
+    If any of these positions are out of bounds, then they
+    are simply ignored. Naturally, a position is not checked
+    if it does not contain a roll of paper (@).
 
     Parameters
     ----------
@@ -291,6 +312,94 @@ def solve_part2(inputs: list[str]) -> int:
     Returns
     -------
     int
+        The number of rolls of paper that can be accessed
+        by a forklift.
+    """
+    acessible_positions: list[tuple[int, int]] = []
+
+    n_rows: int = len(inputs)
+    n_cols: int = len(inputs[0])
+
+    # We need to be careful that Python list indexing does
+    # a looparound when using negative indices.
+    for i in range(n_rows):
+        for j in range(n_cols):
+            # Move on if position (i, j) is not a paper roll
+            if inputs[i][j] != "@":
+                continue
+
+            # Count the number of adjacent paper rolls
+            adjacent_rolls: int = 0
+            for i_inc in [-1, 0, 1]:
+                for j_inc in [-1, 0, 1]:
+                    # Skip the position itself
+                    if i_inc == 0 and j_inc == 0:
+                        continue
+
+                    ni: int = i + i_inc
+                    nj: int = j + j_inc
+
+                    # Check for out of bounds
+                    if ni < 0 or ni >= n_rows:
+                        continue
+                    if nj < 0 or nj >= n_cols:
+                        continue
+
+                    # Count adjacent paper roll
+                    if inputs[ni][nj] == "@":
+                        adjacent_rolls += 1
+
+            # Check if the roll is reachable
+            if adjacent_rolls < 4:
+                # print(i, j)  # so we can check on the example
+                acessible_positions.append((i, j))
+
+    return acessible_positions
+
+
+
+def solve_part2(inputs: list[str]) -> int:
+    """
+    Solves part 2. Determines from the complete input
+    how many rolls of paper can be removed by a forklift
+    before no more rolls are accessible.
+
+    This is done by iterating as done in part 1 over the
+    input grid to determine which rolls can be accessed
+    by a forklift and storing these positions. After a
+    pass, the stored positions are modified in the input
+    to not contain a roll anymore and a new pass is done.
+    This repeats until no more rolls can be accessed.
+
+    Note
+    ----
+    We denote i the index along the vertical axis (rows)
+    and j the index along the horizontal axis (columns).
+    Inspecting for a position at indices (i, j) requires
+    checking the following relative positions:
+        - (i-1, j-1) : top left
+        - (i-1, j)   : top
+        - (i-1, j+1) : top right
+        - (i, j-1)   : left
+        - (i, j+1)   : right
+        - (i+1, j-1) : bottom left
+        - (i+1, j)   : bottom
+        - (i+1, j+1) : bottom right
+
+    If any of these positions are out of bounds, then they
+    are simply ignored. Naturally, a position is not checked
+    if it does not contain a roll of paper (@).
+
+    Parameters
+    ----------
+    inputs : list[str]
+        The input lines representing banks of batteries.
+
+    Returns
+    -------
+    int
+        The number of rolls that can be removed before no
+        more rolls are accessible by a forklift.
     """
     return 0
 
