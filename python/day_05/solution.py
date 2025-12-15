@@ -119,11 +119,13 @@ def solve_part1(inputs: list[str]) -> int:
         # We check against all ranges to check if it falls in
         for range_start, range_end in fresh_ranges:
             if range_start <= id <= range_end:
-                print(f"ID {id} is fresh: in range ({range_start}-{range_end})")
+                # print(f"ID {id} is fresh: in range ({range_start}-{range_end})")  # so we can check on the example
                 number_of_fresh_ingredients += 1
                 break  # No need to check further ranges
 
+    # Return the total count
     return number_of_fresh_ingredients
+
 
 # ----- Part 2 ----- #
 
@@ -151,8 +153,8 @@ if __name__ == "__main__":
     inputs: list[str] = INPUTS.read_text().splitlines()
 
     # print(solve_part1(EXAMPLE.read_text().splitlines()))
-    # solution1 = solve_part1(inputs)
-    # print(f"Part 1 answer: {solution1}")
+    solution1 = solve_part1(inputs)
+    print(f"Part 1 answer: {solution1}")
 
     # print(solve_part2(EXAMPLE.read_text().splitlines()))
     # solution2 = solve_part2(inputs)
