@@ -119,6 +119,7 @@ def solve_part1(inputs: list[str]) -> int:
         # We check against all ranges to check if it falls in
         for range_start, range_end in fresh_ranges:
             if range_start <= id <= range_end:
+                print(f"ID {id} is fresh: in range ({range_start}-{range_end})")
                 number_of_fresh_ingredients += 1
                 break  # No need to check further ranges
 
