@@ -58,6 +58,33 @@ INPUTS: Path = DAY_DIR / "input.txt"
 EXAMPLE: Path = DAY_DIR / "example.txt"
 
 
+# ----- Common ----- #
+
+def get_ranges_and_ids(inputs: list[str]) -> tuple[list[tuple[int, int]], list[int]]:
+    """
+    Parses the input lines into the ranges of fresh ingredients as
+    well as the available ingredient IDs.
+
+    The distinction between these two sections is a blank line in
+    the input, which would be an empty list after we've split the
+    input into lines.
+
+    Parameters
+    ----------
+    inputs : list[str]
+        The input lines.
+    """
+    # Trust the input in aoc, there's only one blank line
+    blank_line_idx: int = inputs.index("")
+    ranges_lines: list[str] = inputs[:blank_line_idx]
+    ids_lines: list[str] = inputs[blank_line_idx + 1 :]
+
+    # Cast to the actual expected types
+    ranges: list[tuple[int, int]] = [(int(line.split("-")[0]), int(line.split("-")[-1])) for line in ranges_lines]
+    ids: list[int] = [int(line) for line in ids_lines]
+    return ranges, ids
+
+
 # ----- Part 1 ----- #
 
 
