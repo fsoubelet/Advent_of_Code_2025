@@ -60,6 +60,7 @@ EXAMPLE: Path = DAY_DIR / "example.txt"
 
 # ----- Common ----- #
 
+
 def get_ranges_and_ids(inputs: list[str]) -> tuple[list[tuple[int, int]], list[int]]:
     """
     Parses the input lines into the ranges of fresh ingredients as
@@ -80,7 +81,9 @@ def get_ranges_and_ids(inputs: list[str]) -> tuple[list[tuple[int, int]], list[i
     ids_lines: list[str] = inputs[blank_line_idx + 1 :]
 
     # Cast to the actual expected types
-    ranges: list[tuple[int, int]] = [(int(line.split("-")[0]), int(line.split("-")[-1])) for line in ranges_lines]
+    ranges: list[tuple[int, int]] = [
+        (int(line.split("-")[0]), int(line.split("-")[-1])) for line in ranges_lines
+    ]
     ids: list[int] = [int(line) for line in ids_lines]
     return ranges, ids
 
@@ -90,19 +93,36 @@ def get_ranges_and_ids(inputs: list[str]) -> tuple[list[tuple[int, int]], list[i
 
 def solve_part1(inputs: list[str]) -> int:
     """
-    Solves part 1.
+    Solves part 1. We parse the inputs into the ranges of fresh
+    ingredient IDs and the available ingredient IDs, then count
+    how many of the available IDs fall into any of the fresh ranges.
+
+    This is done by brute force, by looping over the available IDs
+    and checking against the ranges. We can stop checking the ranges
+    as soon as one contains the ID.
 
     Parameters
     ----------
     inputs : list[str]
-        The input lines representing banks of batteries.
+        The input lines representing the ranges and IDs.
 
     Returns
     -------
     int
+        The number of available ingredients that are fresh.
     """
-    return 0
+    number_of_fresh_ingredients: int = 0
+    fresh_ranges, available_ids = get_ranges_and_ids(inputs)
 
+    # We go and check for each available ID
+    for id in available_ids:
+        # We check against all ranges to check if it falls in
+        for range_start, range_end in fresh_ranges:
+            if range_start <= id <= range_end:
+                number_of_fresh_ingredients += 1
+                break  # No need to check further ranges
+
+    return number_of_fresh_ingredients
 
 # ----- Part 2 ----- #
 
@@ -110,10 +130,12 @@ def solve_part1(inputs: list[str]) -> int:
 def solve_part2(inputs: list[str]) -> int:
     """
     Solves part 2.
+
     Parameters
     ----------
     inputs : list[str]
-        The input lines representing banks of batteries.
+    inputs : list[str]
+        The input lines representing the ranges and IDs.
 
     Returns
     -------
