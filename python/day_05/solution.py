@@ -150,15 +150,50 @@ def solve_part1(inputs: list[str]) -> int:
 # ----- Part 2 ----- #
 
 
+def merge_ranges(ranges: list[tuple[int, int]]) -> list[tuple[int, int]]:
+    """
+    Merge overlapping ranges into single ranges, for easier
+    counting of unique IDs later on. For instance, the ranges
+    (3-5) and (5-8) would be merged into (3-8).
+
+    Note
+    ----
+    This is done sorting the ranges and then going over them,
+    removing any start or end if it falls into the previous range.
+
+    Parameters
+    ----------
+    ranges : list[tuple[int, int]]
+        The list of ranges to merge.
+
+    Returns
+    -------
+    list[tuple[int, int]]
+        The merged ranges.
+    """
+    sorted_ranges = sorted(ranges)
+    merged = [sorted_ranges[0]]
+
+    # Go over the ranges and merge as needed
+    for start, end in sorted_ranges[1:]:  # we already took the first range
+        last_start, last_end = merged[-1]
+        if start <= last_end + 1:  # this range starts in the previous one
+            merged[-1] = (last_start, max(last_end, end))  # extend the previous range
+        else:
+            merged.append((start, end))  # no overlap, just add
+
+    return merged
+
+
 def solve_part2(inputs: list[str]) -> int:
     """
     Solves part 2. We parse the inputs into the ranges of fresh
     ingredient IDs and the available ingredient IDs, the latter
     is discarded for this part.
 
-    We then go over the ranges and count how many IDs sit within
-    the fresh ranges. We must be wary not to count an ingredient
-    ID more than once if it falls into multiple ranges.
+    We start by sorting then merging ranges so that they are ordered
+    and unique: no ID sits in multiple ranges. The final result is
+    a matter of accumulating the lengths of each range.
 
     Parameters
     ----------
@@ -171,22 +206,21 @@ def solve_part2(inputs: list[str]) -> int:
         The number of ingredient IDs that are considered fresh
         according to the fresh ranges.
     """
-    all_valid_ids: list[int] = []
     fresh_ranges, _ = get_ranges_and_ids(inputs)
-    print(len(fresh_ranges))
+    merged_ranges = merge_ranges(fresh_ranges)
+    number_of_valid_ids: int = 0
 
     # We go over each range and count the number of IDs in it
-    for range_start, range_end in fresh_ranges:
-        print(f"Range ({range_start}-{range_end}) with length {range_end - range_start + 1}")
-        for id in range(range_start, range_end + 1):
-            all_valid_ids.append(id)
+    for range_start, range_end in merged_ranges:
+        # print(f"Range ({range_start}-{range_end}) with length {range_end - range_start + 1}")
 
-    # Now we might have added the same ID multiple times, so
-    # we convert to a set to get the unique IDs only
-    unique_valid_ids: set[int] = set(all_valid_ids)
+        # Since the ranges have been ordered and merged, we can be sure
+        # there is no element in multiple ranges. We can then just add
+        # the length of the range to the total count (number of IDs in it)
+        number_of_valid_ids += range_end - range_start + 1
 
     # We return the number of unique valid IDs
-    return len(unique_valid_ids)
+    return number_of_valid_ids
 
 
 # ----- Running ----- #
